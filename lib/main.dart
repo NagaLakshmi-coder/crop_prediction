@@ -86,7 +86,7 @@ class _AiCropAppState extends State<AiCropApp> {
         '/predict': (context) => const CropPrediction(),
         '/weather': (context) => const WeatherForecast(),
         '/schemes': (context) => const GovtSchemes(),
-        '/voice': (context) => const VoiceAssistant(),
+        '/voice': (context) => const VoiceAssistantChatFast(),
         '/login': (context) =>
             LoginScreen(setLocale: setLocale, selectedLocale: _selectedLocale),
         '/register': (context) => RegisterScreen(

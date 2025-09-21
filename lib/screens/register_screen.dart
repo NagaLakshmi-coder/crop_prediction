@@ -33,12 +33,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 validator: (v)=>v==null||v.isEmpty?AppLocalizations.of(context)!.required:null,
                 onSaved: (v)=>name=v!.trim(),
               ),
-              const SizedBox(height: 15),
+               const SizedBox(height: 30),
               TextFormField(
-                decoration: InputDecoration(labelText: AppLocalizations.of(context)!.email, border: const OutlineInputBorder()),
-                validator: (v)=>v==null||!v.contains("@")?AppLocalizations.of(context)!.invalid_email:null,
-                onSaved: (v)=>email=v!.trim(),
+                decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.email,
+                border: const OutlineInputBorder(),
               ),
+              validator: (v) {
+              if (v == null || v.isEmpty) {
+                 return AppLocalizations.of(context)!.invalid_email;
+             }
+           // Email regex: something@something.com
+           final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+           if (!emailRegex.hasMatch(v.trim())) {
+               return AppLocalizations.of(context)!.invalid_email;
+            }
+            return null;
+           },
+             onSaved: (v) => email = v!.trim(),
+             ),
               const SizedBox(height: 15),
               TextFormField(
                 decoration: InputDecoration(labelText: AppLocalizations.of(context)!.password, border: const OutlineInputBorder()),

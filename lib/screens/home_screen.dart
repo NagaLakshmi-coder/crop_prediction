@@ -41,22 +41,11 @@ class HomeScreen extends StatelessWidget {
                   icon: Icons.card_giftcard,
                   onTap: () => Navigator.pushNamed(context, '/schemes'),
                 ),
-
-                // Farmer Dashboard — only if userRole is farmer
-                if (userRole == 'farmer')
-                  _DashboardTile(
+                _DashboardTile(
                     title: AppLocalizations.of(context)!.farmer_dashboard,
                     icon: Icons.dashboard,
                     onTap: () =>
                         Navigator.pushNamed(context, '/farmerDashboard'),
-                  ),
-
-                // Admin Dashboard — only if userRole is admin
-                if (userRole == 'admin')
-                  _DashboardTile(
-                    title: "Admin Dashboard",
-                    icon: Icons.admin_panel_settings,
-                    onTap: () => Navigator.pushNamed(context, '/admin'),
                   ),
               ],
             ),
