@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-
 import 'screens/welcome_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
@@ -82,7 +81,10 @@ class _AiCropAppState extends State<AiCropApp> {
             setLocale: setLocale, selectedLocale: _selectedLocale),
         '/home': (context) => const HomeScreen(),
         '/admin': (context) => const AdminDashboard(),
-        '/farmerDashboard': (context) => const FarmerDashboard(),
+        '/farmerDashboard': (context) => FarmerDashboard(
+              setLocale: setLocale,
+              selectedLocale: _selectedLocale,
+            ),
         '/predict': (context) => const CropPrediction(),
         '/weather': (context) => const WeatherForecast(),
         '/schemes': (context) => const GovtSchemes(),

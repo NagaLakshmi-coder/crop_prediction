@@ -26,44 +26,56 @@ class _VoiceAssistantChatFastState extends State<VoiceAssistantChatFast> {
     super.initState();
 
     _speech = stt.SpeechToText();
-    _speech.initialize();
+    _initSpeech();
 
     _flutterTts = FlutterTts();
-    _flutterTts.setLanguage("en-US");
-    _flutterTts.setPitch(1.0);
-    _flutterTts.setSpeechRate(0.8);
-    _flutterTts.setVolume(1.0);
+    _initTts();
   }
 
-void _listen() async {
-  if (!_isListening) {
-    bool available = await _speech.initialize();
-    if (available) {
-      setState(() {
-        _isListening = true;
-        _chatHistory.add({'sender': 'user', 'message': ''});
-      });
+  Future<void> _initSpeech() async {
+    await _speech.initialize();
+  }
 
-      _speech.listen(
-        onResult: (val) {
-          String recognized = val.recognizedWords;
-          if (recognized.isNotEmpty) {
-            setState(() {
-              _chatHistory.last['message'] = recognized;
-            });
-            _scrollToBottom();
+  Future<void> _initTts() async {
+    await _flutterTts.setLanguage("en-US");
+    await _flutterTts.setPitch(1.0);
+    await _flutterTts.setSpeechRate(0.8);
+    await _flutterTts.setVolume(1.0);
+    await _flutterTts.awaitSpeakCompletion(true);
+  }
 
-            // Reset timer every time user speaks
-            _speechTimeout?.cancel();
-            _speechTimeout = Timer(Duration(seconds: _timeoutSeconds), _stopListeningAutomatically);
-          }
-        },
-        listenMode: stt.ListenMode.dictation,
-        partialResults: true,
-      );
+  void _listen() async {
+    if (!_isListening) {
+      if (_speech.isAvailable) {
+        setState(() => _isListening = true);
+
+        _speech.listen(
+          onResult: (val) {
+            String recognized = val.recognizedWords;
+            if (recognized.isNotEmpty) {
+              if (_chatHistory.isEmpty || _chatHistory.last['sender'] != 'user') {
+                _chatHistory.add({'sender': 'user', 'message': recognized});
+              } else {
+                _chatHistory.last['message'] = recognized;
+              }
+              setState(() {});
+              _scrollToBottom();
+
+              // Reset timer when user speaks
+              _speechTimeout?.cancel();
+              _speechTimeout =
+                  Timer(Duration(seconds: _timeoutSeconds), _stopListeningAutomatically);
+            }
+          },
+          listenMode: stt.ListenMode.dictation,
+          partialResults: true,
+        );
+      }
+    } else {
+      // toggle stop when button is pressed again
+      _stopListeningAutomatically();
     }
   }
-}
 
   void _stopListeningAutomatically() {
     if (!_isListening) return;
@@ -75,7 +87,10 @@ void _listen() async {
   }
 
   void _processUserMessage() {
-    String userMessage = _chatHistory.last['message']?.trim() ?? '';
+    String userMessage = _chatHistory.isNotEmpty
+        ? _chatHistory.last['message']?.trim() ?? ''
+        : '';
+
     if (userMessage.isEmpty) {
       setState(() {
         _chatHistory.add({'sender': 'bot', 'message': 'You did not say anything.'});
@@ -87,7 +102,6 @@ void _listen() async {
 
     String botReply = _getReply(userMessage);
 
-    // Speak reply instantly
     _flutterTts.speak(botReply);
 
     setState(() {
